@@ -8,12 +8,24 @@ remotes::install_github("FABLE-consortium/FABLEDownscalR", dependencies = TRUE)
 library(FABLEDownscalR)
 library(dplyr)
 library(here)
+library(ggnewscale)
+library(here)
+library(ggpattern)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(countrycode)
+library(tidyr)
+library(stringr)
 
 
 # (2) Read config (you can implement fdr_read_yaml in the package)
-cfg <- fdr_read_config(here::here("config", "IND.yml"))
+cfg <- fdr_read_config(here::here("config", "BRA.yml"))
 cfg$stamp <- format(Sys.Date(), "%y%m%d")
 set.seed(cfg$seed)
+
+country <- countrycode::countrycode(cfg$country, origin = 'iso3c', destination = 'country.name')
+border_sf <- rnaturalearth::ne_countries(country = country, scale = "medium", returnclass = "sf")
+
 
 # (3) Load raw inputs (geojson + mapping + grid + FABLE)
 inputs <- fdr_load_inputs(
@@ -57,7 +69,8 @@ results <- fdr_run_downscaling(
   country_luc  = luc$country_luc,
   priors       = priors,
   mnl_niter    = cfg$mnl_niter,
-  mnl_nburn    = cfg$mnl_nburn
+  mnl_nburn    = cfg$mnl_nburn,
+  country_iso3 = cfg$country
 )
 
 # (9) Save outputs (consistent naming)
@@ -77,6 +90,15 @@ fdr_save_outputs(
 )
 
 message("✅ Done: ", cfg$country, " (", cfg$pathway, ")")
+
+
+# SAVING PLOTS #
+
+# Setting directory
+figure_directory <- here("output", cfg$country)
+dir.create(figure_directory, recursive = TRUE, showWarnings = FALSE)
+print(figure_directory)
+
 # 
 # p <- fdr_plot_downscaled_maps(
 #   out_res = results$out.res,                 # or res$downscaled_LUC if you keep that
@@ -89,31 +111,65 @@ message("✅ Done: ", cfg$country, " (", cfg$pathway, ")")
 p_main_LU <- fdr_plot_downscaled_LU_one(
   out_res          = results$out.res, 
   rasterized_layer = id$rasterized_layer,
-  ns_map           = id$ns_map)
+  ns_map           = id$ns_map,
+  border_sf        = border_sf,
+  LU = c("cropland", "forest", "pasture", "otherland"),
+  year = "2020"
+  # LU = "newforest"
+)
 
-ggplot2::ggsave(
-  filename = here("Output", cfg$country, paste0("MainLU_", cfg$pathway, ".tiff")), 
-  plot = p_main_LU, 
-  units = "in", 
-  height = 10, width = 10, dpi = 300)
+# ggplot2::ggsave(
+#   filename = here("Output", cfg$country, paste0("MainLU_", cfg$pathway, ".tiff")), 
+#   plot = p_main_LU, 
+#   units = "in", 
+#   height = 10, width = 10, dpi = 300)
 
 p_LU <- fdr_plot_downscaled_LU(
   out_res          = results$out.res, 
   rasterized_layer = id$rasterized_layer,
-  ns_map           = id$ns_map
+  ns_map           = id$ns_map,
+  border_sf        = border_sf
 )
 
-ggplot2::ggsave(
-  filename = here("Output", cfg$country, paste0("LU_", cfg$pathway, ".tiff")), 
-  plot = p_LU, 
-  units = "in", 
-  height = 10, width = 10, dpi = 300)
+# ggplot2::ggsave(
+#   filename = here("Output", cfg$country, paste0("LU_", cfg$pathway, ".tiff")), 
+#   plot = p_LU, 
+#   units = "in", 
+#   height = 12, width = 7.45, dpi = 300)
+
+# p_LUC <- fdr_plot_downscaled_LUC(
+#   out_res          = results$out.res, 
+#   rasterized_layer = id$rasterized_layer,
+#   ns_map           = id$ns_map
+# )
 
 p_LUC <- fdr_plot_downscaled_LUC(
-  out_res          = results$out.res, 
+  out_res = results$out.res,
   rasterized_layer = id$rasterized_layer,
-  ns_map           = id$ns_map
+  ns_map = id$ns_map,
+  border_sf= border_sf,
+  LU = c("cropland", "pasture", "otherland", "newforest")
 )
+
+print(p_LUC)
+
+
+p_GHG <- fdr_plot_downscaled_GHG(
+  out_res          = results$out.res,
+  rasterized_layer = id$rasterized_layer,
+  ns_map           = id$ns_map,
+  border_sf= border_sf
+)
+print(p_GHG)
+
+
+p_GHG_cum <- fdr_plot_downscaled_GHG_cum(
+  out_res          = results$out.res,
+  rasterized_layer = id$rasterized_layer,
+  ns_map           = id$ns_map,
+  border_sf= border_sf
+)
+print(p_GHG_cum)
 
 ggplot2::ggsave(
   filename = here("Output", cfg$country, paste0("LUC_", cfg$pathway, ".tiff")), 
