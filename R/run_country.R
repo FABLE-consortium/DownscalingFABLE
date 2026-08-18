@@ -1,20 +1,31 @@
 # DownscalingFABLE/R/run_country.R
 
+# ==================================================================
+# USER SETTINGS
+# ==================================================================
+
+# Select the configuration file to use for this run.
+# The file must be located in the config/ folder.
+config_file <- "BRA.yml"
+
+
+# ------------------------------------------------------------------
+# 1. Load packages
+# ------------------------------------------------------------------
+
+# Restore the project environment once after cloning the repository:
+#install.packages("renv")
 #renv::restore()
 
-#install.packages("devtools")
-devtools::load_all("../FABLEDownscalR")
-
-
-# remotes::install_github("FABLE-consortium/FABLEDownscalR", dependencies = TRUE)
-# library(FABLEDownscalR)
-
-# (1) Load your package (devtools::load_all is done by .Rprofile)
+# In normal use, load the installed package.
+# In developer mode, devtools::load_all() will already have loaded it.
+if (!"package:FABLEDownscalR" %in% search()) {
+  library(FABLEDownscalR)
+}
 
 library(dplyr)
 library(here)
 library(ggnewscale)
-library(here)
 library(ggpattern)
 library(rnaturalearth)
 library(rnaturalearthdata)
@@ -23,14 +34,36 @@ library(tidyr)
 library(stringr)
 
 
-# (2) Read config (you can implement fdr_read_yaml in the package)
-cfg <- fdr_read_config(here::here("config", "BRA.yml"))
+# ------------------------------------------------------------------
+# 2. Read configuration
+# ------------------------------------------------------------------
+
+cfg <- fdr_read_config(
+  here::here("config", config_file)
+)
+
+# Automatically create the date stamp used in output filenames
 cfg$stamp <- format(Sys.Date(), "%y%m%d")
+
+# Ensure reproducible MNL estimation
 set.seed(cfg$seed)
 
-country <- countrycode::countrycode(cfg$country, origin = 'iso3c', destination = 'country.name')
-border_sf <- rnaturalearth::ne_countries(country = country, scale = "medium", returnclass = "sf")
 
+# ------------------------------------------------------------------
+# 3. Prepare country information
+# ------------------------------------------------------------------
+
+country <- countrycode::countrycode(
+  cfg$country,
+  origin = "iso3c",
+  destination = "country.name"
+)
+
+border_sf <- rnaturalearth::ne_countries(
+  country = country,
+  scale = "medium",
+  returnclass = "sf"
+)
 
 # (3) Load raw inputs (geojson + mapping + grid + FABLE)
 inputs <- fdr_load_inputs(
