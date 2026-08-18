@@ -80,9 +80,10 @@ results <- fdr_run_downscaling(
 
 # (9) Save outputs (consistent naming)
 fdr_save_outputs(
-  country  = cfg$country,
-  tag      = fdr_make_tag(cfg),
-  outputs  = list(
+  country     = cfg$country,
+  tag         = fdr_make_tag(cfg),
+  output_root = cfg$output_root,
+  outputs     = list(
     start_map_reproj   = harm$start_map_reproj,
     ns_map             = harm$ns_map,
     rasterized_layer   = id$rasterized_layer,
