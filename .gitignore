@@ -10,6 +10,7 @@ Data/BRA/
 Data/IND/
 Data/GBR/
 Data/ARG/
+Data/UZB/
 Output/
 *.tif
 *.geojson
@@ -19,3 +20,12 @@ Program/Downscaling_report_cache/
 Documents/
 Program
 Output
+BRA/
+IND/
+ETH/
+UZB/
+config/BRA.yml
+config/ETH.yml
+config/IND.yml
+config/UZB.yml
+
