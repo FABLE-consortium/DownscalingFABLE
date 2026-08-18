@@ -11,7 +11,7 @@ library(writexl)
 
 devtools::load_all("../FABLEDownscalR")
 
-cfg <- fdr_read_config(here::here("config", "IND.yml"))
+cfg <- fdr_read_config(here::here("config", "BRA.yml"))
 cfg$stamp <- format(Sys.Date(), "%y%m%d")
 set.seed(cfg$seed)
 
@@ -191,8 +191,40 @@ GHG_cum <- fdr_plot_downscaled_GHG_cum(
   limits           = c(-25, 30)
   
 )
-
 print(GHG_cum$plot)
+
+GHG_cum_newforest <- fdr_plot_downscaled_GHG_cum(
+  out_res          = out.res,
+  rasterized_layer = rasterized_layer,
+  ns_map           = ns_map,
+  border_sf        = border_sf,
+  LU               = c("newforest"),
+  year             = 2050
+  
+)
+print(GHG_cum_newforest$plot)
+GHG_cum_cropland <- fdr_plot_downscaled_GHG_cum(
+  out_res          = out.res,
+  rasterized_layer = rasterized_layer,
+  ns_map           = ns_map,
+  border_sf        = border_sf,
+  LU               = c("cropland"),
+  year             = 2050
+  
+)
+print(GHG_cum_cropland$plot)
+GHG_cum_otherland <- fdr_plot_downscaled_GHG_cum(
+  out_res          = out.res,
+  rasterized_layer = rasterized_layer,
+  ns_map           = ns_map,
+  border_sf        = border_sf,
+  LU               = c("otherland"),
+  year             = 2050
+  
+)
+print(GHG_cum_otherland$plot)
+
+View(GHG_cum_otherland$cum_GHG)
 
 ggplot2::ggsave(
   filename = here("Output", cfg$country, paste0("Cummulative_LUC_CO2_emissions_", cfg$pathway, ".tiff")), 
@@ -205,7 +237,7 @@ GHG_transition  <-  fdr_plot_downscaled_GHG_transition(
   rasterized_layer = rasterized_layer,
   ns_map           = ns_map,
   border_sf        = border_sf,
-  LU = c("newforest")
+  LU = c("cropland", "newforest", "otherland")
 )
 print(GHG_transition$plot)
 
