@@ -229,7 +229,7 @@ getwd()
 Once the working directory is correctly set:
 
 ```r
-source("scripts/run_country.R")
+source("R/run_country.R")
 ```
 Replace IND.yml with your configuration file.
 
