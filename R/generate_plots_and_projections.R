@@ -303,29 +303,29 @@ figure_file <- function(name) {
 # This can take some time and is therefore left commented out by default.
 # -----------------------------------------------------------------------------
 
-# p_main_LU <- fdr_plot_downscaled_LU_one(
-#   out_res          = out.res,
-#   rasterized_layer = rasterized_layer,
-#   ns_map           = ns_map,
-#   LU               = c(
-#     "cropland",
-#     "forest",
-#     "pasture",
-#     "otherland"
-#   ),
-#   year             = "2020"
-# )
-#
-# print(p_main_LU)
-#
-# ggplot2::ggsave(
-#   filename = figure_file("Dominant_Land_Cover"),
-#   plot     = p_main_LU,
-#   units    = "in",
-#   height   = 7.45,
-#   width    = 7.45,
-#   dpi      = 300
-# )
+p_main_LU <- fdr_plot_downscaled_LU_one(
+  out_res          = out.res,
+  rasterized_layer = rasterized_layer,
+  ns_map           = ns_map,
+  LU               = c(
+    "cropland",
+    "forest",
+    "pasture",
+    "otherland"
+  ),
+  year             = "2020"
+)
+
+print(p_main_LU)
+
+ggplot2::ggsave(
+  filename = figure_file("Dominant_Land_Cover"),
+  plot     = p_main_LU,
+  units    = "in",
+  height   = 5,
+  width    = 7.45,
+  dpi      = 300
+)
 
 
 # -----------------------------------------------------------------------------
@@ -367,6 +367,7 @@ p_LUC <- fdr_plot_downscaled_LUC(
   LU               = LUC_classes,
   limits           = LUC_limits
 )
+  
 
 print(p_LUC)
 
@@ -706,8 +707,8 @@ GHG_cum <- fdr_plot_downscaled_GHG_cum(
   rasterized_layer = rasterized_layer,
   ns_map           = ns_map,
   border_sf        = border_sf,
-  year             = cumulative_year,
-  limits           = GHG_cumulative_limits
+  year             = c(2020, 2050)
+  # limits           = GHG_cumulative_limits
 )
 
 print(GHG_cum$plot)
@@ -722,7 +723,7 @@ ggplot2::ggsave(
   ),
   plot   = GHG_cum$plot,
   units  = "in",
-  height = 5,
+  height = 4,
   width  = 6,
   dpi    = 300
 )

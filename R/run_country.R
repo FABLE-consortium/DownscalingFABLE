@@ -23,7 +23,7 @@ if (requireNamespace("devtools", quietly = TRUE)) {
   devtools::load_all("../FABLEDownscalR", quiet = TRUE)
 }
 
-remotes::install_github("davidecozza99/FABLEDownscalR", dependencies = TRUE, force = TRUE) #Run if FABLEDownscalR has been modified
+# remotes::install_github("davidecozza99/FABLEDownscalR", dependencies = TRUE, force = TRUE) #Run if FABLEDownscalR has been modified
 
 
 
