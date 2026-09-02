@@ -18,7 +18,7 @@
 
 # Select the configuration file corresponding to the run to analyse.
 # The file must be located in the config/ folder.
-config_file <- "BRA.yml"
+config_file <- "UZB.yml"
 
 
 # ---------------------------------------------------------------------------
@@ -29,7 +29,7 @@ config_file <- "BRA.yml"
 #   country + pathway + start_map_source
 #
 # To analyse a specific older run, enter its full tag instead, for example:
-# run_tag <- "260810_BRA_CurrentTrends_HILDA"
+# run_tag <- "260810_UZB_CurrentTrends_HILDA"
 run_tag <- NULL
 
 

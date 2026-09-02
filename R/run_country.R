@@ -6,7 +6,7 @@
 
 # Select the configuration file to use for this run.
 # The file must be located in the config/ folder.
-config_file <- "BRA.yml"
+config_file <- "UZB.yml"
 
 
 # ------------------------------------------------------------------
