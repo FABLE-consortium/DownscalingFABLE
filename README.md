@@ -70,9 +70,9 @@ Each country folder must contain:
 | `Population2020.geojson`                | Population data                  |
 | `ProtectedAreas.geojson`                | Protected areas                  |
 | `TravelTime.geojson`                    | Travel time                      |
-| `LandCoverHILDA2015.geojson`            | Baseline land cover (HILDA)      |
-| `LandCoverCopernicus2019.geojson`       | Baseline land cover (Copernicus) |
-| `LandCoverChangeHILDA2015_2019.geojson` | Land-use transitions             |
+| `LandCoverESACCI2015.geojson`           | initial land cover (ESACCI)      |
+| `LandCoverESACCI2020.geojson`           | starting land cover (ESACCI)     |
+| `LandCoverChangeHILDA2015_2020.geojson` | Historical Land-use transitions  |
 | `ForestManagement.geojson`              | Forest management                |
 | `Altitude.geojson`                      | Altitude                         |
 | `Slope.geojson`                         | Slope                            |
@@ -173,7 +173,7 @@ Main Parameters
 | ------------------ | ------------------------------------------ |
 | `country`          | ISO3 country code                          |
 | `pathway`          | FABLE scenario                             |
-| `start_map_source` | `HILDA` or `Copernicus`                    |
+| `start_map_source` | ESACCI (HILDA or Copernicus)               |
 | `pixel_res_m`      | Raster resolution (50000 / 10000 / 1000 m) |
 Dates and output tags are generated automatically.
 
