@@ -19,12 +19,12 @@ config_file <- "UZB.yml"
 
 # In normal use, load the installed package.
 # In developer mode, devtools::load_all() will already have loaded it.
-if (requireNamespace("devtools", quietly = TRUE)) {
-  devtools::load_all("../FABLEDownscalR", quiet = TRUE)
-}
+# if (requireNamespace("devtools", quietly = TRUE)) {
+#   devtools::load_all("../FABLEDownscalR", quiet = TRUE)
+# }
 
 # remotes::install_github("davidecozza99/FABLEDownscalR", dependencies = TRUE, force = TRUE) #Run if FABLEDownscalR has been modified
-remotes::install_github("FABLE-consortium/FABLEDownscalR")
+# remotes::install_github("FABLE-consortium/FABLEDownscalR", force = TRUE)
 
 if (!"package:FABLEDownscalR" %in% search()) {
   library(FABLEDownscalR)
