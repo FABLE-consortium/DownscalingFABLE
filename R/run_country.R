@@ -84,13 +84,24 @@ inputs <- fdr_load_inputs(
 # (4) Build land-cover change calibration table (DownscalR format)
 luc <- lc_build_country_luc(
   LandCoverChange_df = inputs$spatial$landcoverchange,
-  map_HILDA_LUC      = inputs$mapping$map_LUC,
+  map_LUC            = inputs$mapping$map_LUC,
   Ts                 = 2015
 )
 
-# (5) Harmonise start map to match FABLE baseline totals
-harm <- fdr_harmonize_start_map(
-  LandCover_df  = inputs$spatial$landcover,
+# (5) a  Harmonise start map to match FABLE baseline totals
+harm_starting <- fdr_harmonize_start_map(
+  LandCoverStarting_df  = inputs$spatial$landcoverstarting,
+  LandCoverInitial_df   = inputs$spatial$landcoverinitial,
+  type          = "starting",
+  map_LC        = inputs$mapping$map_LC,
+  LC_targets    = inputs$LC_targets
+)
+
+# (5) b Harmonise initial map to match FABLE baseline totals
+harm_initial <- fdr_harmonize_start_map(
+  LandCoverStarting_df  = inputs$spatial$landcoverstarting,
+  LandCoverInitial_df   = inputs$spatial$landcoverinitial,
+  type = "initial",
   map_LC        = inputs$mapping$map_LC,
   LC_targets    = inputs$LC_targets
 )
@@ -98,14 +109,14 @@ harm <- fdr_harmonize_start_map(
 # (6) Build ns_map + rasterized ID layer (resolution controlled by YAML)
 id <- fdr_build_id_maps(
   grid_sp         = inputs$grid_sp,      # e.g. Travel as sp/sf geometry for cells
-  ns_map          = harm$ns_map,
+  ns_map          = harm_starting$ns_map,
   pixel_res_m     = cfg$pixel_res_m
 )
 
 # (7) Build priors (X matrix etc.) + drop cells with NA covariates
 priors <- fdr_build_priors(
   inputs         = inputs,
-  start_map      = harm$start_map_reproj,
+  start_map      = harm_initial$start_map_reproj,
   good_ns_only   = TRUE
 )
 
@@ -125,8 +136,8 @@ fdr_save_outputs(
   tag         = fdr_make_tag(cfg),
   output_root = cfg$output_root,
   outputs     = list(
-    start_map_reproj   = harm$start_map_reproj,
-    ns_map             = harm$ns_map,
+    start_map_reproj   = harm_starting$start_map_reproj,
+    ns_map             = harm_starting$ns_map,
     rasterized_layer   = id$rasterized_layer,
     grid_sf            = id$grid_sf,
     X_long             = results$X_long,
