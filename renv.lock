@@ -124,7 +124,7 @@
       "RemoteRepo": "FABLEDownscalR",
       "RemoteUsername": "FABLE-consortium",
       "RemoteRef": "HEAD",
-      "RemoteSha": "3b69d5af48b4771f613fb678a434c99ae60aa43d",
+      "RemoteSha": "2c319846a2b027723f587608cb586c7033bd033c",
       "NeedsCompilation": "no"
     },
     "KernSmooth": {
