@@ -454,8 +454,49 @@ Transition_CO2_em <- out.res %>%
   )
 
 
+
+
 # =============================================================================
-# 7. HISTORICAL EMISSION-FACTOR SUMMARIES
+# 7. PROJECTED EMISSION-FACTOR SUMMARIES
+#
+# IMPORTANT:
+# These summaries intentionally use PROJECTED observed land-use transitions
+# from  projected/downscaled transitions.
+#
+# The objectives are:
+# 1. To estimate the average emission factors for each area, considering only
+# the areas where land-use change is projected to occur in the future years.
+
+# 2. To compare these area-specific average emission factors with the emission
+# factors used in the FABLE Calculator, which are not spatially explicit and
+# are therefore not based on the locations where land-use change is
+# projected to occur.
+
+# =============================================================================
+
+
+Projected_EF_weighted <- out.res %>%
+  group_by(lu.from, lu.to) %>%
+  mutate(
+    EF_weighted = sum(value * ef_biomass, na.rm = TRUE) / sum(value, na.rm = TRUE),
+    total_area = sum(value, na.rm = TRUE)
+  ) %>%
+  ungroup() %>% 
+  select(lu.from, lu.to, EF_weighted) %>%
+  distinct() %>% 
+  mutate(lu.to = paste0("EF_", lu.to)) %>%
+  pivot_wider(
+    names_from = lu.to,
+    values_from = EF_weighted
+  ) %>%
+  rename(LandCoverInit = lu.from) %>% 
+  filter(!LandCoverInit %in% c("newforest")) %>% 
+  select(-c("EF_forest"))
+
+
+
+# =============================================================================
+# 8. HISTORICAL EMISSION-FACTOR SUMMARIES
 #
 # IMPORTANT:
 # These summaries intentionally use HISTORICAL observed land-use transitions
@@ -480,7 +521,7 @@ C_TO_CO2 <- 44 / 12
 
 
 # -----------------------------------------------------------------------------
-# 7.1 Prepare one spatial EF value per ns × transition
+# 8.1 Prepare one spatial EF value per ns × transition
 #
 # EF_LUC is spatial but static in the current implementation.
 # out.res contains the same EF repeated across projection years.
@@ -503,7 +544,7 @@ EF_spatial <- out.res %>%
 
 
 # -----------------------------------------------------------------------------
-# 7.2 Historical transition-weighted average emission factors
+# 8.2 Historical transition-weighted average emission factors
 #
 # luc_hist provides the ACTUAL observed transition area.
 #
@@ -553,7 +594,7 @@ average_EF <- EF_spatial %>%
 
 
 # -----------------------------------------------------------------------------
-# 7.3 Distribution of EFs for historically observed transitions
+# 8.3 Distribution of EFs for historically observed transitions
 #
 # Here luc_hist is used to restrict the EF distribution to transitions
 # that ACTUALLY occurred historically.
@@ -590,7 +631,7 @@ distribution_EF_long <- EF_spatial %>%
 
 
 # -----------------------------------------------------------------------------
-# 7.4 Descriptive statistics of historical spatial EFs
+# 8.4 Descriptive statistics of historical spatial EFs
 # -----------------------------------------------------------------------------
 
 EF_summary <- distribution_EF_long %>%
@@ -634,7 +675,7 @@ EF_summary <- distribution_EF_long %>%
 
 
 # -----------------------------------------------------------------------------
-# 7.5 Wide EF distribution table
+# 8.5 Wide EF distribution table
 #
 # Kept because it can be useful for inspecting individual grid-cell EFs
 # and reproduces the structure of the earlier workflow.
@@ -657,7 +698,7 @@ distribution_EF <- distribution_EF_long %>%
 
 
 # =============================================================================
-# 8. EXPORT GHG AND EF SUMMARY TABLES TO EXCEL
+# 9. EXPORT GHG AND EF SUMMARY TABLES TO EXCEL
 # =============================================================================
 
 summary_file <- file.path(
@@ -674,6 +715,7 @@ writexl::write_xlsx(
     # Projected pathway results
     TotalCO2_5year    = TotalCO2_5year,
     Transition_CO2_em = Transition_CO2_em,
+    Projected_EF_weighted = Projected_EF_weighted,
     
     # Historical EF characterisation
     Historical_EF_weighted = average_EF,
@@ -692,14 +734,14 @@ message(
 
 
 # =============================================================================
-# 9. CUMULATIVE PROJECTED LAND-USE-CHANGE GHG EMISSIONS
+# 10. CUMULATIVE PROJECTED LAND-USE-CHANGE GHG EMISSIONS
 #
 # These maps use the projected / downscaled pathway.
 # =============================================================================
 
 
 # -----------------------------------------------------------------------------
-# 9.1 Cumulative emissions across all land-cover classes
+# 10.1 Cumulative emissions across all land-cover classes
 # -----------------------------------------------------------------------------
 
 GHG_cum <- fdr_plot_downscaled_GHG_cum(
@@ -730,7 +772,7 @@ ggplot2::ggsave(
 
 
 # -----------------------------------------------------------------------------
-# 9.2 Separate cumulative maps for selected land-cover classes
+# 10.2 Separate cumulative maps for selected land-cover classes
 # -----------------------------------------------------------------------------
 
 GHG_cum_by_LU <- list()
@@ -773,7 +815,7 @@ for (lu in cumulative_LU_classes) {
 
 
 # =============================================================================
-# 10. PROJECTED GHG EMISSIONS BY LAND-USE TRANSITION
+# 11. PROJECTED GHG EMISSIONS BY LAND-USE TRANSITION
 # =============================================================================
 
 GHG_transition <- fdr_plot_downscaled_GHG_transition(
@@ -802,7 +844,7 @@ ggplot2::ggsave(
 
 
 # =============================================================================
-# 11. FINISH
+# 12. FINISH
 # =============================================================================
 
 message("")
