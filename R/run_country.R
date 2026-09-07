@@ -149,4 +149,8 @@ fdr_save_outputs(
 
 message("✅ Done: ", cfg$country, " (", cfg$pathway, ")")
 
-
+write.xlsx(
+  EF_Pools_transition_Cell %>%  filter(iso3 =="UZB"),
+  "C:/Users/Davide Cozza/Documents/GitHub/DownscalingFABLE/Data/global/EF_Pools_transition_Cell.xlsx",
+  overwrite = TRUE
+)
