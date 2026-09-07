@@ -453,7 +453,32 @@ Transition_CO2_em <- out.res %>%
     .groups = "drop"
   )
 
+# -----------------------------------------------------------------------------
+# 6.3 Projected land-use transition by land cover
+# -----------------------------------------------------------------------------
 
+Projected_LU <- out.res %>% 
+  select(-times.1, -ef_biomass) %>% 
+  group_by(times, lu.to, lu.from) %>% 
+  dplyr::mutate(total_LU = sum(value, na.rm = TRUE)) %>% 
+  ungroup() %>% 
+  select(-ns, -value, -GHG_biomass) %>% 
+  distinct() %>% 
+  mutate(
+    lu.to_label = recode(lu.to,
+                         "forest"     = "ToForest",
+                         "otherland"  = "ToOtherLand",
+                         "cropland"   = "ToCropland",
+                         "pasture"    = "ToPasture",
+                         "urban"      = "ToUrban",
+                         "newforest"  = "ToNewForest"
+    )
+  ) %>% 
+  select(-lu.to) %>% 
+  pivot_wider(
+    names_from  = lu.to_label,
+    values_from = total_LU
+  )
 
 
 # =============================================================================
@@ -715,6 +740,7 @@ writexl::write_xlsx(
     # Projected pathway results
     TotalCO2_5year    = TotalCO2_5year,
     Transition_CO2_em = Transition_CO2_em,
+    Projected_LU = Projected_LU,
     Projected_EF_weighted = Projected_EF_weighted,
     
     # Historical EF characterisation
