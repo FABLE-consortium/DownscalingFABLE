@@ -481,6 +481,8 @@ Projected_LU <- out.res %>%
   )
 
 
+
+
 # =============================================================================
 # 7. PROJECTED EMISSION-FACTOR SUMMARIES
 #
@@ -499,13 +501,22 @@ Projected_LU <- out.res %>%
 
 # =============================================================================
 
+# Carbon → CO2 conversion
+C_TO_CO2 <- 44 / 12
 
 Projected_EF_weighted <- out.res %>%
   group_by(lu.from, lu.to) %>%
   mutate(
-    EF_weighted = sum(value * ef_biomass, na.rm = TRUE) / sum(value, na.rm = TRUE),
-    total_area = sum(value, na.rm = TRUE)
+    EF_CO2 = ef_biomass * C_TO_CO2
+    # EF_weighted = sum(value * EF_CO2, na.rm = TRUE) / sum(value, na.rm = TRUE),
+    # total_area = sum(value, na.rm = TRUE)
   ) %>%
+  summarise(
+  EF_weighted = weighted.mean(
+    EF_CO2,
+    w = value,
+    na.rm = TRUE
+  )) %>% 
   ungroup() %>% 
   select(lu.from, lu.to, EF_weighted) %>%
   distinct() %>% 
@@ -541,8 +552,6 @@ Projected_EF_weighted <- out.res %>%
 # =============================================================================
 
 
-# Carbon → CO2 conversion
-C_TO_CO2 <- 44 / 12
 
 
 # -----------------------------------------------------------------------------
@@ -797,6 +806,7 @@ ggplot2::ggsave(
 )
 
 
+
 # -----------------------------------------------------------------------------
 # 10.2 Separate cumulative maps for selected land-cover classes
 # -----------------------------------------------------------------------------
@@ -839,6 +849,54 @@ for (lu in cumulative_LU_classes) {
   )
 }
 
+
+
+# -----------------------------------------------------------------------------
+# 10.3 Cumulative GHG maps for selected land-cover transitions
+# -----------------------------------------------------------------------------
+# This block isolates cumulative GHG emissions/sequestration for a specific
+# set of land-use transitions (origin -> destination), rather than all
+# transitions landing on a given destination land cover.
+#
+# To adapt: update the parameters below to the transition(s) and year(s)
+# of interest. The figure filename is generated automatically from these.
+
+# --- Parameters -------------------------------------------------------------
+lu_from_selected <- c("pasture")   # <- set origin land-cover class(es) here
+lu_to_selected   <- "otherland"                 # <- set destination land-cover class here
+
+# --- Filter and plot ---------------------------------------------------------
+out_res_filtered <- out.res %>%
+  dplyr::filter(lu.from %in% lu_from_selected)
+
+GHG_cum <- fdr_plot_downscaled_GHG_cum(
+  out_res          = out_res_filtered,
+  rasterized_layer = rasterized_layer,
+  ns_map           = ns_map,
+  border_sf        = border_sf,
+  year             = c(2050),
+  LU               = lu_to_selected
+)
+
+print(GHG_cum$plot)
+
+ggplot2::ggsave(
+  filename = figure_file(
+    paste0(
+      "Cumulative_LUC_CO2_Emissions_",
+      paste(lu_from_selected, collapse = "_"),
+      "_to_",
+      lu_to_selected,
+      "_",
+      "2050"
+    )
+  ),
+  plot   = GHG_cum$plot,
+  units  = "in",
+  height = ,
+  width  = 6,
+  dpi    = 300
+)
 
 # =============================================================================
 # 11. PROJECTED GHG EMISSIONS BY LAND-USE TRANSITION
